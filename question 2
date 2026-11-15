@@ -1,17 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int slow_calls = 0;      * number of calls to the slow function *
-int audit_log_count = 0; * usd for the changed condition *
+int slow_calls = 0;      /* number of calls to the slow function */
+int audit_log_count = 0; /* usd for the changed condition */
 
-* Simulates the slow server verification of the disability card *
+/* Simulates the slow server verification of the disability card */
 int verify_card(int has_card)
 {
     slow_calls++;
     return has_card;
 }
 
-* Cheap checks *
+/* Cheap checks */
 int is_senior(int age)          { return age >= 60; }
 int class_eligible(int cls)     { return cls == 1 || cls == 2; }
 
@@ -28,7 +28,7 @@ int main(void)
 
     int grant;
 
-    /* Experiment 1: cheap checks first, slow call last (short-circuit) *
+    /* Experiment 1: cheap checks first, slow call last (short-circuit) */
     slow_calls = 0;
     for (int i = 0; i < n; i++)
         grant = (is_senior(age[i]) && class_eligible(cls[i])) || verify_card(card[i]);
