@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-* Each bit of one byte stores the ON/OFF state of one device. *
+/* Each bit of one byte stores the ON/OFF state of one device. */
 enum { LIGHT = 0, FAN = 1, AC = 2, HEATER = 3, PUMP = 4 };
 
 unsigned char switch_on(unsigned char reg, int dev)
