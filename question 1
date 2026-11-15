@@ -1,0 +1,27 @@
+#include <stdio.h>
+int main(void)
+{
+    int price[] = {100, 250, 333};
+    int qty[]   = {5, 6, 4};
+    int senior[] = {1, 0, 1};
+
+    for (int i = 0; i < 3; i++) {
+        int total, net;
+        /* Buggy version */
+        total = price[i] * qty[i] - price[i] * qty[i] * 15 / 100 * senior[i]
+                + price[i] * qty[i] * 5 / 100;
+        net = total > 1000 ? total - 50 : total;
+
+        /* Correct version */
+        double gross    = price[i] * qty[i];
+        double discount = senior[i] ? gross * 15.0 / 100.0 : 0.0;
+        double taxable  = gross - discount;
+        double gst      = taxable * 5.0 / 100.0;
+        double correct  = taxable + gst;
+        double correct_net = correct > 1000 ? correct - 50 : correct;
+
+        printf("Bill %d: buggy total=%d net=%d | correct total=%.2f net=%.2f\n",
+               i + 1, total, net, correct, correct_net);
+    }
+    return 0;
+}
