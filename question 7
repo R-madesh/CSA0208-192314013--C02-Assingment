@@ -1,0 +1,46 @@
+ #include <stdio.h>
+
+unsigned long checks = 0;
+
+/* Original: tries every divisor from 2 to n-1 */
+int is_prime_original(unsigned long n)
+{
+    checks = 0;
+    if (n < 2) return 0;
+    for (unsigned long i = 2; i < n; i++) {
+        checks++;
+        if (n % i == 0) return 0;
+    }
+    return 1;
+}
+
+/* Redesigned: only odd divisors up to sqrt(n) */
+int is_prime_redesigned(unsigned long n)
+{
+    checks = 0;
+    if (n < 2) return 0;
+    if (n == 2) return 1;
+    checks++;
+    if (n % 2 == 0) return 0;
+    for (unsigned long i = 3; i <= n / i; i += 2) {
+        checks++;
+        if (n % i == 0) return 0;
+    }
+    return 1;
+}
+
+int main(void)
+{
+    unsigned long tickets[] = {97, 100, 7919, 1000003};
+    printf("%-9s %-10s %-18s %-18s\n", "Ticket", "Result", "Original checks", "Redesigned checks");
+    for (int k = 0; k < 4; k++) {
+        int p1 = is_prime_original(tickets[k]);
+        unsigned long c1 = checks;
+        int p2 = is_prime_redesigned(tickets[k]);
+        unsigned long c2 = checks;
+        printf("%-9lu %-10s %-18lu %-18lu %s\n", tickets[k],
+               p2 ? "prime" : "not prime", c1, c2,
+               (p1 == p2) ? "(same answer)" : "(MISMATCH!)");
+    }
+    return 0;
+}
