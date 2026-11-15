@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int slow_calls = 0;      * number of calls to the slow function *
+int audit_log_count = 0; * usd for the changed condition *
+
+* Simulates the slow server verification of the disability card *
+int verify_card(int has_card)
+{
+    slow_calls++;
+    return has_card;
+}
+
+* Cheap checks *
+int is_senior(int age)          { return age >= 60; }
+int class_eligible(int cls)     { return cls == 1 || cls == 2; }
+
+int main(void)
+{
+    int n = 1000;
+    int age[1000], cls[1000], card[1000];
+    srand(42);
+    for (int i = 0; i < n; i++) {
+        age[i]  = 20 + rand() % 70;   /* 20..89 */
+        cls[i]  = 1 + rand() % 4;     /* class 1..4 */
+        card[i] = (rand() % 10 == 0); /* 10% have a disability card */
+    }
+
+    int grant;
+
+    /* Experiment 1: cheap checks first, slow call last (short-circuit) *
+    slow_calls = 0;
+    for (int i = 0; i < n; i++)
+        grant = (is_senior(age[i]) && class_eligible(cls[i])) || verify_card(card[i]);
+    printf("Order 1 (cheap first, slow last, &&/||) : %d slow calls\n", slow_calls);
+
+    /* Experiment 2: slow check first */
+    slow_calls = 0;
+    for (int i = 0; i < n; i++)
+        grant = verify_card(card[i]) || (is_senior(age[i]) && class_eligible(cls[i]));
+    printf("Order 2 (slow first)                     : %d slow calls\n", slow_calls);
+
+    /* Experiment 3: non-short-circuit | and & */
+    slow_calls = 0;
+    for (int i = 0; i < n; i++)
+        grant = (is_senior(age[i]) & class_eligible(cls[i])) | verify_card(card[i]);
+    printf("Order 3 (& and | used)                   : %d slow calls\n", slow_calls);
+
+    /* Experiment 4: nested if */
+    slow_calls = 0;
+    for (int i = 0; i < n; i++) {
+        if (is_senior(age[i])) {
+            if (class_eligible(cls[i])) grant = 1;
+            else grant = verify_card(card[i]);
+        } else {
+            grant = verify_card(card[i]);
+        }
+    }
+    printf("Order 4 (nested if)                      : %d slow calls\n", slow_calls);
+
+    /* Demonstration of && and || not evaluating the second operand */
+    int x = 0, y = 0;
+    if (0 && (x = 5)) {}
+    if (1 || (y = 5)) {}
+    printf("After 0 && (x=5): x = %d (not evaluated)\n", x);
+    printf("After 1 || (y=5): y = %d (not evaluated)\n", y);
+
+    /* & vs && */
+    int a = 0, b = 0;
+    if (0 & (a = 5)) {}
+    printf("After 0 & (a=5) : a = %d (evaluated!)\n", a);
+    (void)b; (void)grant;
+    return 0;
+}
