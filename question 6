@@ -1,0 +1,33 @@
+ #include <stdio.h>
+
+int main(void)
+{
+    double balance = 10000.0, rate = 0.02, repay = 2000.0;
+    double totalInterest = 0.0, interest, payment;
+    int month = 0;
+    const int LIMIT = 360;
+
+    if (repay <= balance * rate) {
+        printf("Repayment (%.2f) does not cover monthly interest (%.2f). Loan can never be cleared.\n",
+               repay, balance * rate);
+        return 1;
+    }
+
+    printf("Month   Interest    Payment     Balance\n");
+    while (balance > 0.005) {
+        if (month >= LIMIT) {
+            printf("Safety limit of %d months reached. Balance still %.2f. Please review the loan terms.\n",
+                   LIMIT, balance);
+            break;
+        }
+        month++;
+        interest = balance * rate;
+        totalInterest += interest;
+        balance += interest;
+        payment = (balance < repay) ? balance : repay;   /* last month */
+        balance -= payment;
+        printf("%5d %10.2f %10.2f %11.2f\n", month, interest, payment, balance);
+    }
+    printf("Months = %d, Total interest = %.2f\n", month, totalInterest);
+    return 0;
+}
